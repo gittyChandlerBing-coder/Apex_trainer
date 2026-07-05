@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" />
+<style>
+:root{--void:#080808;--iron:#141414;--steel:#1e1e1e;--volt:#D4FF00;--ash:#F0F0F0;--muted:#5a5a5a;--dim:rgba(255,255,255,0.05)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--void);color:var(--ash);overflow-x:hidden}
+
+/* PROGRESS */
+#prog{position:fixed;top:0;left:0;height:2px;background:var(--volt);z-index:400;width:0;transition:width .08s linear}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:300;padding:1.2rem 5%;display:flex;justify-content:space-between;align-items:center;transition:all .4s ease}
+nav.scrolled{background:rgba(8,8,8,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--dim);padding:.9rem 5%}
+.mark{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.12em;cursor:pointer;color:var(--ash)}
+.mark em{color:var(--volt);font-style:normal}
+.nav-r{display:flex;align-items:center;gap:1.2rem}
+.ncta{font-family:'Inter',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:var(--volt);color:var(--void);border:none;padding:.6rem 1.4rem;cursor:pointer;transition:background .3s}
+.ncta:hover{background:#fff}
+.burger{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:4px}
+.burger span{display:block;height:1.5px;background:var(--ash);transition:all .3s}
+.burger span:first-child{width:22px}
+.burger span:last-child{width:14px}
+.burger:hover span{background:var(--volt);width:22px!important}
+
+/* DRAWER */
+.dim{position:fixed;inset:0;z-index:350;background:rgba(8,8,8,0);pointer-events:none;transition:background .5s}
+.dim.open{background:rgba(8,8,8,.85);pointer-events:all}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:360px;background:var(--iron);border-left:1px solid var(--dim);display:flex;flex-direction:column;padding:2rem;transform:translateX(100%);transition:transform .65s cubic-bezier(.76,0,.24,1)}
+.dim.open .drawer{transform:translateX(0)}
+.dtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:4rem}
+.dbrand{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.12em}
+.dbrand em{color:var(--volt);font-style:normal}
+.xbtn{background:none;border:1px solid var(--dim);color:var(--muted);padding:.4rem .75rem;font:.7rem/1 'Inter',sans-serif;cursor:pointer;transition:all .3s;letter-spacing:.1em}
+.xbtn:hover{border-color:var(--volt);color:var(--volt)}
+.dlinks{flex:1;display:flex;flex-direction:column;justify-content:center}
+.dwrap{overflow:hidden;margin-bottom:.15rem}
+.dl{display:block;font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:.06em;cursor:pointer;transform:translateX(110%);transition:transform .55s cubic-bezier(.76,0,.24,1),color .3s;line-height:1.1;color:var(--ash)}
+.dim.open .dl{transform:translateX(0)}
+.dl:hover{color:var(--volt)}
+.dfoot{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--dim);padding-top:1.5rem}
+
+/* HERO */
+.hero{height:100vh;min-height:640px;position:relative;display:flex;align-items:flex-end;overflow:hidden}
+.hbg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80') center/cover no-repeat;filter:brightness(.28) saturate(.6);will-change:transform}
+.hvign{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,1) 0%,rgba(8,8,8,.5) 45%,rgba(8,8,8,.05) 100%)}
+.hbody{position:relative;z-index:10;padding:0 5% 5.5rem;width:100%}
+.kicker{font-size:.6rem;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--volt);display:block;margin-bottom:1.2rem;opacity:0;animation:fade .5s ease 1.8s forwards}
+.hl{font-family:'Bebas Neue',sans-serif;font-size:clamp(5rem,14vw,13rem);line-height:.86;letter-spacing:.01em;margin-bottom:2.5rem}
+.hl-row{overflow:hidden;display:block}
+.hw{display:inline-block;opacity:0}
+.hw.L{animation:wL .7s cubic-bezier(.16,1,.3,1) forwards}
+.hw.R{animation:wR .7s cubic-bezier(.16,1,.3,1) forwards}
+.hw.volt{color:var(--volt)}
+.hsub{font-size:.95rem;font-weight:300;color:rgba(240,240,240,.5);max-width:400px;line-height:1.75;margin-bottom:2.5rem;opacity:0;animation:fade .5s ease 1.6s forwards}
+.hbtns{display:flex;align-items:center;gap:1.2rem;opacity:0;animation:fade .5s ease 1.95s forwards}
+.bpri{font-family:'Bebas Neue',sans-serif;letter-spacing:.15em;font-size:1.05rem;background:var(--volt);color:var(--void);border:none;padding:1rem 2.8rem;cursor:pointer;position:relative;overflow:hidden;transition:color .35s}
+.bpri::after{content:'';position:absolute;inset:0;background:#fff;transform:translateX(-101%);transition:transform .35s cubic-bezier(.76,0,.24,1)}
+.bpri:hover::after{transform:translateX(0)}
+.bpri span{position:relative;z-index:1}
+.bghost{font:.72rem/1 'Inter',sans-serif;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:rgba(240,240,240,.38);background:none;border:none;cursor:pointer;transition:color .3s}
+.bghost:hover{color:var(--ash)}
+.scroll-hint{position:absolute;right:5%;bottom:4.5rem;z-index:10;display:flex;flex-direction:column;align-items:center;gap:.55rem;opacity:0;animation:fade .5s ease 2.2s forwards}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--volt);animation:pulse 2s ease-in-out infinite}
+.scroll-hint span{font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(240,240,240,.28);writing-mode:vertical-rl}
+
+/* STATS */
+.stats{background:var(--iron);padding:6rem 5% 5rem;clip-path:polygon(0 2.5rem,100% 0,100% 100%,0 100%);margin-top:-2rem}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;max-width:1100px;margin:0 auto}
+.stat{text-align:center}
+.sval{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,6vw,5.5rem);line-height:1;color:var(--volt);letter-spacing:.02em}
+.slbl{font-size:.66rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:.4rem}
+
+/* PROGRAMS */
+.progs{padding:7rem 5%}
+.sechd{margin-bottom:4rem}
+.eyebrow{display:block;font-size:.6rem;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--volt);margin-bottom:.8rem}
+.h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,5.5vw,4.8rem);letter-spacing:.03em;color:var(--ash);line-height:.95}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.card{background:var(--iron);border:1px solid var(--dim);padding:2.5rem;position:relative;cursor:default;transition:border-color .3s;transform-style:preserve-3d}
+.card.hot{border-color:var(--volt)}
+.cbadge{position:absolute;top:-1px;left:2rem;background:var(--volt);color:var(--void);font-size:.54rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:.28rem .8rem}
+.cname{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.08em;color:var(--ash);margin-top:.5rem;margin-bottom:.45rem}
+.cdesc{font-size:.78rem;color:var(--muted);line-height:1.65;margin-bottom:1.8rem}
+.cprice{display:flex;align-items:baseline;gap:.2rem;margin-bottom:2rem}
+.cpnum{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--ash);line-height:1;letter-spacing:.01em}
+.card.hot .cpnum{color:var(--volt)}
+.cpmo{font-size:.76rem;color:var(--muted)}
+.feats{list-style:none;margin-bottom:2.2rem}
+.feat{font-size:.8rem;color:rgba(240,240,240,.65);padding:.52rem 0;border-bottom:1px solid var(--dim);display:flex;align-items:center;gap:.7rem}
+.feat::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--volt);flex-shrink:0}
+.ccta{display:block;width:100%;text-align:center;font-family:'Bebas Neue',sans-serif;letter-spacing:.15em;font-size:1rem;padding:.9rem;cursor:pointer;border:1px solid var(--dim);background:transparent;color:var(--ash);transition:all .3s}
+.card.hot .ccta{background:var(--volt);color:var(--void);border-color:var(--volt)}
+.ccta:hover{background:var(--volt);color:var(--void);border-color:var(--volt)}
+
+/* ABOUT */
+.about{background:var(--iron);padding:7rem 5%;clip-path:polygon(0 0,100% 2.5rem,100% 100%,0 calc(100% - 2.5rem))}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;max-width:1200px;margin:0 auto;padding:2rem 0}
+.trimg{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;display:block;filter:grayscale(15%) contrast(1.08)}
+.atag{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;background:var(--volt);color:var(--void);padding:.28rem .9rem;margin-bottom:1.5rem}
+.trname{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,5.5vw,5rem);letter-spacing:.04em;color:var(--ash);line-height:1;margin-bottom:.45rem}
+.trtitle{font-size:.7rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:2rem}
+.bodytxt{font-size:.93rem;font-weight:300;line-height:1.85;color:rgba(240,240,240,.58)}
+.creds{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:2rem}
+.cred{font-size:.58rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--dim);color:rgba(240,240,240,.4);padding:.35rem .8rem}
+
+/* TESTIMONIALS */
+.testi{padding:7rem 5%}
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.tcard{background:var(--iron);border:1px solid var(--dim);padding:2rem;position:relative;overflow:hidden;transition:border-color .3s}
+.tcard:hover{border-color:rgba(212,255,0,.25)}
+.tcard::before{content:'"';position:absolute;top:-1rem;right:.8rem;font-family:'Bebas Neue',sans-serif;font-size:9rem;color:rgba(212,255,0,.045);line-height:1;pointer-events:none}
+.tavatar{width:48px;height:48px;border-radius:50%;object-fit:cover;filter:grayscale(20%);border:2px solid rgba(212,255,0,.22);margin-bottom:1.2rem;display:block}
+.tquote{font-size:.85rem;line-height:1.78;color:rgba(240,240,240,.62);font-style:italic;margin-bottom:1.5rem}
+.tname{font-size:.73rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);margin-bottom:.2rem}
+.tresult{font-size:.66rem;color:var(--volt);font-weight:500;letter-spacing:.05em}
+
+/* CTA */
+.ctasec{background:var(--volt);padding:9rem 5%;text-align:center;clip-path:polygon(0 2.5rem,100% 0,100% 100%,0 100%);margin-top:-2rem}
+.ctalabel{font-size:.6rem;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:rgba(8,8,8,.42);display:block;margin-bottom:1rem}
+.ctahl{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,9vw,8rem);letter-spacing:.03em;color:var(--void);line-height:1;margin-bottom:1.5rem}
+.ctasub{font-size:1rem;font-weight:300;color:rgba(8,8,8,.52);max-width:460px;margin:0 auto 3rem;line-height:1.7}
+.ctarow{display:flex;max-width:440px;margin:0 auto}
+.ctainp{flex:1;background:rgba(8,8,8,.1);border:2px solid rgba(8,8,8,.16);border-right:none;color:var(--void);font:inherit;font-size:.9rem;padding:.95rem 1.1rem;outline:none;transition:background .3s}
+.ctainp::placeholder{color:rgba(8,8,8,.36)}
+.ctainp:focus{background:rgba(8,8,8,.16)}
+.ctago{background:var(--void);color:var(--volt);border:none;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.1em;padding:.95rem 1.8rem;cursor:pointer;transition:background .3s}
+.ctago:hover{background:#111}
+.ctathanks{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.08em;color:var(--void)}
+
+/* FOOTER */
+footer{background:var(--void);border-top:1px solid var(--dim);padding:2.5rem 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.fbrand{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.12em}
+.fbrand em{color:var(--volt);font-style:normal}
+.fcopy{font-size:.66rem;color:var(--muted)}
+.flinks{display:flex;gap:1.5rem}
+.flink{font-size:.62rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .3s}
+.flink:hover{color:var(--volt)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
+.rv.in{opacity:1;transform:translateY(0)}
+
+/* KEYFRAMES */
+@keyframes wL{from{opacity:0;transform:translateX(-70px) skewX(6deg)}to{opacity:1;transform:translateX(0) skewX(0)}}
+@keyframes wR{from{opacity:0;transform:translateX(70px) skewX(-6deg)}to{opacity:1;transform:translateX(0) skewX(0)}}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.7)}50%{opacity:1;transform:scale(1.4)}}
+
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .cards{grid-template-columns:1fr;max-width:380px;margin:0 auto}
+  .tgrid{grid-template-columns:1fr}
+  .about-grid{grid-template-columns:1fr;gap:3rem}
+  .drawer{width:100%}
+}
+@media(max-width:600px){
+  footer{flex-direction:column;text-align:center}
+  .flinks{justify-content:center}
+  .ctarow{flex-direction:column}
+  .ctainp{border-right:2px solid rgba(8,8,8,.16);border-bottom:none}
+  .about{clip-path:none}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<!-- NAV -->
+<nav id="topnav">
+  <div class="mark" onclick="scrollTo2('hero')">APEX<em>.</em></div>
+  <div class="nav-r">
+    <button class="ncta" onclick="scrollTo2('ctasec')">Start Now</button>
+    <button class="burger" onclick="openDrawer()" aria-label="Open menu">
+      <span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- DRAWER -->
+<div class="dim" id="dim" onclick="handleDimClick(event)">
+  <div class="drawer">
+    <div class="dtop">
+      <div class="dbrand">APEX<em>.</em></div>
+      <button class="xbtn" onclick="closeDrawer()">✕ close</button>
+    </div>
+    <nav class="dlinks">
+      <div class="dwrap"><span class="dl" data-id="hero" onclick="drawerNav(this)">Home</span></div>
+      <div class="dwrap"><span class="dl" data-id="progs" onclick="drawerNav(this)" style="transition-delay:.07s">Programs</span></div>
+      <div class="dwrap"><span class="dl" data-id="about" onclick="drawerNav(this)" style="transition-delay:.14s">About</span></div>
+      <div class="dwrap"><span class="dl" data-id="testi" onclick="drawerNav(this)" style="transition-delay:.21s">Testimonials</span></div>
+      <div class="dwrap"><span class="dl" data-id="ctasec" onclick="drawerNav(this)" style="transition-delay:.28s">Start</span></div>
+    </nav>
+    <div class="dfoot">APEX Performance · Est. 2012</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hbg" id="hbg"></div>
+  <div class="hvign"></div>
+  <div class="hbody">
+    <span class="kicker">Performance Coaching · London · Est. 2012</span>
+    <div class="hl">
+      <span class="hl-row"><span class="hw L" style="animation-delay:.2s">FORGE</span></span>
+      <span class="hl-row"><span class="hw R volt" style="animation-delay:.45s">YOUR</span></span>
+      <span class="hl-row"><span class="hw L" style="animation-delay:.7s">LIMITS.</span></span>
+    </div>
+    <p class="hsub">Elite performance coaching that transforms how you train, recover, and compete. No fads. No shortcuts. Just results.</p>
+    <div class="hbtns">
+      <button class="bpri" onclick="scrollTo2('ctasec')"><span>BEGIN YOUR JOURNEY</span></button>
+      <button class="bghost" onclick="scrollTo2('progs')">View Programs ↓</button>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="sdot"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats" id="stats">
+  <div class="stats-grid">
+    <div class="stat"><div class="sval"><span id="s0">0</span>+</div><div class="slbl">Clients Transformed</div></div>
+    <div class="stat"><div class="sval"><span id="s1">0</span></div><div class="slbl">Years Coaching</div></div>
+    <div class="stat"><div class="sval"><span id="s2">0</span>%</div><div class="slbl">Success Rate</div></div>
+    <div class="stat"><div class="sval"><span id="s3">0</span></div><div class="slbl">Average Rating</div></div>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section class="progs" id="progs">
+  <div class="sechd rv">
+    <span class="eyebrow">Training Programs</span>
+    <h2 class="h2">CHOOSE YOUR<br>LEVEL</h2>
+  </div>
+  <div class="cards">
+    <div class="card rv" onmousemove="tilt(event,this)" onmouseleave="untilt(this)">
+      <div class="cname">FOUNDATION</div>
+      <p class="cdesc">The perfect starting point for those ready to build real structure.</p>
+      <div class="cprice"><span class="cpnum">$149</span><span class="cpmo">/month</span></div>
+      <ul class="feats">
+        <li class="feat">3× weekly sessions</li>
+        <li class="feat">Custom nutrition plan</li>
+        <li class="feat">Form coaching</li>
+        <li class="feat">Progress tracking</li>
+        <li class="feat">Monthly check-in</li>
+      </ul>
+      <button class="ccta" onclick="scrollTo2('ctasec')">Get Started</button>
+    </div>
+    <div class="card hot rv" onmousemove="tilt(event,this)" onmouseleave="untilt(this)">
+      <div class="cbadge">Most Popular</div>
+      <div class="cname">ELITE</div>
+      <p class="cdesc">The full athlete experience. For those serious about lasting results.</p>
+      <div class="cprice"><span class="cpnum">$279</span><span class="cpmo">/month</span></div>
+      <ul class="feats">
+        <li class="feat">5× weekly sessions</li>
+        <li class="feat">Advanced programming</li>
+        <li class="feat">Daily nutrition coaching</li>
+        <li class="feat">Video form analysis</li>
+        <li class="feat">Weekly check-ins</li>
+        <li class="feat">Recovery protocol</li>
+      </ul>
+      <button class="ccta" onclick="scrollTo2('ctasec')">Get Started</button>
+    </div>
+    <div class="card rv" onmousemove="tilt(event,this)" onmouseleave="untilt(this)">
+      <div class="cbadge" style="background:#fff;color:var(--void)">Full Access</div>
+      <div class="cname">CHAMPION</div>
+      <p class="cdesc">Unlimited. Unrestricted. The complete performance package.</p>
+      <div class="cprice"><span class="cpnum">$499</span><span class="cpmo">/month</span></div>
+      <ul class="feats">
+        <li class="feat">Unlimited sessions</li>
+        <li class="feat">24/7 direct access</li>
+        <li class="feat">Competition prep</li>
+        <li class="feat">Full team support</li>
+        <li class="feat">Biometric analysis</li>
+        <li class="feat">Priority scheduling</li>
+        <li class="feat">Travel programming</li>
+      </ul>
+      <button class="ccta" onclick="scrollTo2('ctasec')">Get Started</button>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-grid">
+    <div class="rv">
+      <img class="trimg" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80&fit=crop&crop=top" alt="Marcus Webb — Head Coach" />
+    </div>
+    <div class="rv" style="transition-delay:.15s">
+      <span class="atag">Head Coach</span>
+      <h2 class="trname">MARCUS<br>WEBB</h2>
+      <p class="trtitle">CSCS · NSCA · FMS Level 2 · PN Nutrition</p>
+      <p class="bodytxt">Former GB Athletics team strength coach. Marcus has worked with Olympic athletes, professional footballers, and everyday people who refuse to accept their plateau.</p>
+      <p class="bodytxt" style="margin-top:1rem">His philosophy is simple: performance is built in the margins. Sleep, nutrition, recovery, and intelligent programming — not just hard work — separate those who get results from those who just get tired.</p>
+      <div class="creds">
+        <span class="cred">CSCS Certified</span>
+        <span class="cred">PN Level 2</span>
+        <span class="cred">FMS Level 2</span>
+        <span class="cred">Ex-GB Strength Coach</span>
+        <span class="cred">12 Yrs Experience</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi" id="testi">
+  <div class="sechd rv">
+    <span class="eyebrow">Client Results</span>
+    <h2 class="h2">REAL PEOPLE.<br>REAL RESULTS.</h2>
+  </div>
+  <div class="tgrid">
+    <div class="tcard rv">
+      <img class="tavatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80&fit=crop&crop=face" alt="Ryan K." />
+      <p class="tquote">"I've tried every gym, every program. Nothing worked like APEX. Marcus doesn't let you make excuses."</p>
+      <p class="tname">Ryan K.</p>
+      <p class="tresult">↑ Lost 32 lbs in 16 weeks</p>
+    </div>
+    <div class="tcard rv" style="transition-delay:.1s">
+      <img class="tavatar" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&q=80&fit=crop&crop=face" alt="Priya M." />
+      <p class="tquote">"Went from barely lifting to competing in my first powerlifting meet. The programming is next level."</p>
+      <p class="tname">Priya M.</p>
+      <p class="tresult">↑ Deadlifted 2× bodyweight</p>
+    </div>
+    <div class="tcard rv" style="transition-delay:.2s">
+      <img class="tavatar" src="https://images.unsplash.com/photo-1500048993953-d23a436266cf?w=200&q=80&fit=crop&crop=face" alt="James T." />
+      <p class="tquote">"As a runner, I was skeptical of strength training. APEX changed my entire perspective on performance."</p>
+      <p class="tname">James T.</p>
+      <p class="tresult">↑ Marathon in 3:28</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="ctasec" id="ctasec">
+  <span class="ctalabel">Ready to Start?</span>
+  <h2 class="ctahl">NO MORE<br>EXCUSES.</h2>
+  <p class="ctasub">Drop your email and we'll reach out within 24 hours for a free 30-minute discovery call with Marcus.</p>
+  <div id="ctawrap">
+    <div class="ctarow">
+      <input class="ctainp" id="ctaemail" type="email" placeholder="Your email address" />
+      <button class="ctago" onclick="submitCTA()">APPLY NOW</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fbrand">APEX<em>.</em></div>
+  <p class="fcopy">© 2025 APEX Performance · London · All rights reserved</p>
+  <div class="flinks">
+    <a class="flink" href="#">Instagram</a>
+    <a class="flink" href="#">YouTube</a>
+    <a class="flink" href="#">TikTok</a>
+  </div>
+</footer>
+
+<script>
+const scrolledRef = {v:false};
+const countedRef = {v:false};
+
+function scrollTo2(id){
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+
+function openDrawer(){
+  document.getElementById('dim').classList.add('open');
+  document.querySelectorAll('.dl').forEach(el=>el.style.transitionDelay=el.style.transitionDelay||'0s');
+}
+
+function closeDrawer(){
+  document.querySelectorAll('.dl').forEach(el=>el.style.transitionDelay='0s');
+  document.getElementById('dim').classList.remove('open');
+}
+
+function handleDimClick(e){
+  if(e.target===document.getElementById('dim')) closeDrawer();
+}
+
+function drawerNav(el){
+  closeDrawer();
+  setTimeout(()=>scrollTo2(el.dataset.id),400);
+}
+
+function tilt(e,card){
+  const r=card.getBoundingClientRect();
+  const rx=((e.clientY-r.top-r.height/2)/(r.height/2))*-7;
+  const ry=((e.clientX-r.left-r.width/2)/(r.width/2))*7;
+  card.style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.012)`;
+}
+
+function untilt(card){
+  card.style.transition='transform .5s ease';
+  card.style.transform='perspective(900px) rotateX(0) rotateY(0) scale(1)';
+  setTimeout(()=>{card.style.transition='';},500);
+}
+
+function animCounter(el,target,isDecimal,delay){
+  setTimeout(()=>{
+    const dur=1600;
+    const start=performance.now();
+    function tick(now){
+      const t=Math.min((now-start)/dur,1);
+      const ease=1-Math.pow(1-t,3);
+      const val=ease*target;
+      el.textContent=isDecimal?val.toFixed(1):Math.round(val);
+      if(t<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  },delay);
+}
+
+function submitCTA(){
+  const v=document.getElementById('ctaemail').value;
+  if(!v||!v.includes('@')) return;
+  document.getElementById('ctawrap').innerHTML='<p class="ctathanks">✓ WE\'LL BE IN TOUCH SHORTLY.</p>';
+}
+
+// Scroll handler
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  const max=document.documentElement.scrollHeight-window.innerHeight;
+  document.getElementById('prog').style.width=(y/max*100)+'%';
+  const hbg=document.getElementById('hbg');
+  if(hbg) hbg.style.transform=`scale(1.08) translateY(${y*.22}px)`;
+  const s=y>60;
+  if(s!==scrolledRef.v){
+    scrolledRef.v=s;
+    document.getElementById('topnav').classList.toggle('scrolled',s);
+  }
+  if(!countedRef.v){
+    const el=document.getElementById('s0');
+    if(el&&el.getBoundingClientRect().top<window.innerHeight*.85){
+      countedRef.v=true;
+      animCounter(document.getElementById('s0'),847,false,0);
+      animCounter(document.getElementById('s1'),12,false,100);
+      animCounter(document.getElementById('s2'),94,false,200);
+      animCounter(document.getElementById('s3'),4.9,true,300);
+    }
+  }
+},{passive:true});
+
+// Reveal observer
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')});
+},{threshold:.1});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
